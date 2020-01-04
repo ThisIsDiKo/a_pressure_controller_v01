@@ -1,0 +1,2 @@
+flashFunctions.c:15:6:mWrite_flash	48	static
+flashFunctions.c:44:6:mRead_flash	8	static

@@ -1,0 +1,2 @@
+adcStorage.c:24:10:fir_filter	64	static
+adcStorage.c:75:6:xStoreADCDataTask	88	static
