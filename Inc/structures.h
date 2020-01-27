@@ -10,6 +10,13 @@
 
 #include "globals.h"
 
+
+#define	STATUS_NORMAL				0
+#define	STATUS_ERROR_OVERCURRENT	1
+#define	STATUS_ERROR_VALVE			2
+
+
+
 typedef struct{
 	uint8_t  rfChannel;
 	uint8_t  rere;
@@ -41,11 +48,12 @@ typedef enum{
 	RECEIVER
 }AirSystemType;
 
-typedef enum{
-	STATUS_NORMAL,
-	STATUS_ERROR,
-	STATUS_ERROR_OVERCURRENT,
-} ControllerErrorStatus;
+//typedef enum{
+//	STATUS_NORMAL,
+//	STATUS_ERROR,
+//	STATUS_ERROR_OVERCURRENT,
+//	STATUS_ERROR_VALVE
+//} ControllerErrorStatus;
 
 typedef struct{
 	CompensationWorkState analyzeState;
@@ -53,7 +61,8 @@ typedef struct{
 	PressureCompensation prevPressureCompensation;
 	SoundIndicationState soundIndicationState;
 	AirSystemType airSystemType;
-	ControllerErrorStatus errorStatus;
+	//ControllerErrorStatus errorStatus;
+	uint8_t errorStatus;
 	uint16_t nessPressure[4];
 	uint16_t filteredData[4];
 	uint16_t serverUID;

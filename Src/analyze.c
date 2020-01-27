@@ -48,7 +48,11 @@ void xAnalyzeTask(void *arguments){
 	for(;;){
 		xStatus = xSemaphoreTake(xPressureCompensationSemaphore, portMAX_DELAY);
 		if (xStatus == pdPASS){
-
+/*
+ * ---------------------------------------------------------------------------
+ * +++++++++++++++++++++++++++++++++ RECEIVER ++++++++++++++++++++++++++++++++
+ * ---------------------------------------------------------------------------
+ */
 			if (controllerState.airSystemType == RECEIVER){
 				//-------- check for number of tries -----------------
 				controllerState.analyzeState = COMPENSATION_STATE_FREE;
@@ -66,22 +70,66 @@ void xAnalyzeTask(void *arguments){
 					controllerState.numberOfTries += 1;
 				}
 
+				//axles calculations
+				switch (controllerState.waysType){
+					case 1:{ // Single Way
+						numOfAxles = 1;
+						numOfWays[0] = 1;
+						numOfWays[1] = 0;
+						break;
+					}
+					case VIEW_0_2:{ // TWO WAYS ONE AXLE 2
+						numOfAxles = 1;
+						numOfWays[0] = 2;
+						numOfWays[1] = 0;
+						break;
+					}
+					case VIEW_1_1:{ //TWO WAYS TWO AXLE
+						numOfAxles = 2;
+						numOfWays[0] = 1;
+						numOfWays[1] = 1;
+						break;
+					}
+					case VIEW_1_2:{ //THREE WAYS TWO FRONT AXLES
+						numOfAxles = 2;
+						numOfWays[0] = 2;
+						numOfWays[1] = 1;
+						break;
+					}
+					case VIEW_2_1:{ //THREE WAYS SINGLE FRONT AXLES
+						numOfAxles = 2;
+						numOfWays[0] = 1;
+						numOfWays[1] = 2;
+						break;
+					}
+					case VIEW_2_2:{ //FOUR WAYS
+						numOfAxles = 2;
+						numOfWays[0] = 2;
+						numOfWays[1] = 2;
+						break;
+					}
+					default:{
+						controllerState.pressureCompensation = COMPENSATION_OFF;
+						continue;
+					}
+
+				}
 
 				//-------- looking at pressure delta -----------------
-				for (i = 0; i < 4; i++){
+				for (i = 0; i < numOfWays[0]+numOfWays[1]; i++){
 					startPressure[i] = controllerState.filteredData[i];
 					deltaPressure = controllerState.nessPressure[i] - controllerState.filteredData[i];
 					deltaPressure = abs(deltaPressure);
 
 					if (deltaPressure > controllerState.analyzeAccuracy){
 						if (controllerState.nessPressure[i] > controllerState.filteredData[i])
-							pressIsLower[i] = 1;
+							pressIsLower[i] = 1; //if need to lift
 						else
-							pressIsLower[i] = 0;
+							pressIsLower[i] = 0; //if need to lower
 						controllerState.analyzeState = COMPENSATION_STATE_WORKING;
 					}
 					else{
-						pressIsLower[i] = -1;
+						pressIsLower[i] = -1; //if not need to change
 					}
 				}
 
@@ -96,51 +144,6 @@ void xAnalyzeTask(void *arguments){
 
 					mWrite_flash();
 					continue;
-				}
-
-
-				switch (controllerState.waysType){
-					case 1:{ // Single Way
-						numOfAxles = 1;
-						numOfWays[0] = 1;
-						numOfWays[1] = 0;
-						break;
-					}
-					case 2:{ // TWO WAYS ONE AXLE
-						numOfAxles = 1;
-						numOfWays[0] = 2;
-						numOfWays[1] = 0;
-						break;
-					}
-					case 3:{ //TWO WAYS TWO AXLE
-						numOfAxles = 2;
-						numOfWays[0] = 1;
-						numOfWays[1] = 1;
-						break;
-					}
-					case 4:{ //THREE WAYS TWO FRONT AXLES
-						numOfAxles = 2;
-						numOfWays[0] = 2;
-						numOfWays[1] = 1;
-						break;
-					}
-					case 5:{ //THREE WAYS SINGLE FRONT AXLES
-						numOfAxles = 2;
-						numOfWays[0] = 1;
-						numOfWays[1] = 2;
-						break;
-					}
-					case 6:{ //FOUR WAYS
-						numOfAxles = 2;
-						numOfWays[0] = 2;
-						numOfWays[1] = 2;
-						break;
-					}
-					default:{
-						controllerState.pressureCompensation = COMPENSATION_OFF;
-						continue;
-					}
-
 				}
 
 				//calculate impulse
@@ -228,6 +231,10 @@ void xAnalyzeTask(void *arguments){
 						vTaskDelay(20);
 						dCounter = xTaskGetTickCount() - impCounter;
 
+						if (controllerState.pressureCompensation == COMPENSATION_OFF){
+							break;
+						}
+
 						stopImp = 0;
 						for (wayCounter = 0; wayCounter < numOfWays[axleCounter]; wayCounter++){
 							i = axleCounter*numOfWays[0] + wayCounter;
@@ -243,12 +250,22 @@ void xAnalyzeTask(void *arguments){
 					}
 					vTaskDelay(1000);
 				} //stepCounter
+
 				if (controllerState.pressureCompensation == COMPENSATION_OFF){
+					for (i = 0; i < 4; i++){
+						HAL_GPIO_WritePin(DOWN_PORT[i], DOWN_PIN[i], GPIO_PIN_RESET);
+						HAL_GPIO_WritePin(UP_PORT[i], UP_PIN[i], GPIO_PIN_RESET);
+					}
+					impTime[0] = 0;
+					impTime[1] = 0;
+					impTime[2] = 0;
+					impTime[3] = 0;
+					controllerState.numberOfTries = 0;
 					continue;
 				}
 //here starts common code
 
-
+				controllerState.errorMeaningByte = 0;
 				for (i = 0 ; i < 4; i++){
 					if (impTime[i] > 500){
 						deltaPressure = controllerState.filteredData[i] - startPressure[i];
@@ -260,6 +277,10 @@ void xAnalyzeTask(void *arguments){
 								messageLength = sprintf(message, "[ERROR] %d valve %d\t%d\t%d\t%ld\n", i, controllerState.nessPressure[i], startPressure[i], controllerState.filteredData[i], impTime[i]);
 								HAL_UART_Transmit(&huart1, (uint8_t*)message, messageLength, 0xFFFF);
 							#endif
+
+								//TODO: error valve
+								controllerState.errorStatus |= (1 << STATUS_ERROR_VALVE);
+								controllerState.errorByte |= (1 << i);
 
 						}
 					}
@@ -292,8 +313,12 @@ void xAnalyzeTask(void *arguments){
 				}
 				//mWrite_flash();
 			}
+/*
+* ---------------------------------------------------------------------------
+* +++++++++++++++++++++++++++++++++ COMPRESSOR ++++++++++++++++++++++++++++++++
+* ---------------------------------------------------------------------------
+*/
 			else{
-				//TODO: compressor system
 				switch (controllerState.waysType){
 					case 1:{ // Single Way
 						numOfAxles = 1;

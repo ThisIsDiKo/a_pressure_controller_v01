@@ -126,6 +126,7 @@ int main(void)
   MX_ADC2_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
+  HAL_Delay(2000);
   controller_init();
   /* USER CODE END 2 */
 

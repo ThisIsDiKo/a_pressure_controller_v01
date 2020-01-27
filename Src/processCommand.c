@@ -34,6 +34,7 @@ void xProcessCommandTask(void* arguments){
 	//char statusByte = 0;
 	char waysType;
 	char accuracy;
+	uint8_t successCounter = 0;
 
 	for(;;){
 		xStatus = xQueueReceive(xRecCommandQueue, command, portMAX_DELAY);
@@ -53,8 +54,15 @@ void xProcessCommandTask(void* arguments){
 						if (controllerState.pressureCompensation == COMPENSATION_ON){
 							controllerState.status = 0x01;
 						}
-						if (controllerState.errorStatus == STATUS_ERROR_OVERCURRENT){
+
+						//valve overcurrent error
+						if (controllerState.errorStatus & (1 << STATUS_ERROR_OVERCURRENT)){
 							controllerState.status |= 0x02;
+						}
+
+						//pressure valve error
+						if (controllerState.errorStatus & (1 << STATUS_ERROR_VALVE)){
+							controllerState.status |= 0x03;
 						}
 
 						//added statusByte for best indication
@@ -69,7 +77,7 @@ void xProcessCommandTask(void* arguments){
 						HAL_UART_Transmit_DMA(&huart1, (uint8_t*) message, messageLength);
 
 						//if (outputState != prevOutputState && controllerState.errorStatus == STATUS_NORMAL){
-						if (outputState != prevOutputState){
+						if (outputState != prevOutputState && controllerState.errorStatus != STATUS_ERROR_OVERCURRENT){
 
 							controllerState.pressureCompensation = COMPENSATION_OFF;
 
@@ -141,7 +149,7 @@ void xProcessCommandTask(void* arguments){
 								controllerState.analyzeAccuracy = 40;
 							}
 
-							if (controllerState.waysType > 6 || controllerState.waysType < 1){
+							if (controllerState.waysType > 6 || controllerState.waysType < 2){
 
 								#if DEBUG_SERIAL
 									messageLength = sprintf(message, "[ERROR] wrong waystype\n");
@@ -149,6 +157,56 @@ void xProcessCommandTask(void* arguments){
 								#endif
 
 								continue;
+							}
+
+							successCounter = 0;
+							if(controllerState.waysType == VIEW_2_2){
+								for(i = 0; i < 4; i++){
+									if (controllerState.filteredData[i] == 0 || controllerState.nessPressure[i] == 0){
+										//TODO: maybe make inform about sensors
+										continue;
+									}
+									successCounter += 1;
+								}
+								if (successCounter != 4){
+									#if DEBUG_SERIAL
+										messageLength = sprintf(message, "[ERROR] wrong sens\n");
+										HAL_UART_Transmit(&huart1, (uint8_t*)message, messageLength, 0xFFFF);
+									#endif
+									continue;
+								}
+							}
+							else if(controllerState.waysType == VIEW_2_1 || controllerState.waysType == VIEW_1_2){
+								for(i = 0; i < 3; i++){
+									if (controllerState.filteredData[i] == 0 || controllerState.nessPressure[i] == 0){
+										//TODO: maybe make inform about sensors
+										continue;
+									}
+									successCounter += 1;
+								}
+								if (successCounter != 3){
+									#if DEBUG_SERIAL
+										messageLength = sprintf(message, "[ERROR] wrong sens\n");
+										HAL_UART_Transmit(&huart1, (uint8_t*)message, messageLength, 0xFFFF);
+									#endif
+									continue;
+								}
+							}
+							else if(controllerState.waysType == VIEW_1_1 || controllerState.waysType == VIEW_0_2){
+								for(i = 0; i < 2; i++){
+									if (controllerState.filteredData[i] == 0 || controllerState.nessPressure[i] == 0){
+										//TODO: maybe make inform about sensors
+										continue;
+									}
+									successCounter += 1;
+								}
+								if (successCounter != 2){
+									#if DEBUG_SERIAL
+										messageLength = sprintf(message, "[ERROR] wrong sens\n");
+										HAL_UART_Transmit(&huart1, (uint8_t*)message, messageLength, 0xFFFF);
+									#endif
+									continue;
+								}
 							}
 
 							controllerState.pressureCompensation = COMPENSATION_ON;

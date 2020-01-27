@@ -73,15 +73,36 @@ void xScanInputTask(void* arguments){
 				prevOverrcurrentState = curOvercurrentState;
 
 				if (prevOverrcurrentState){
-					HAL_GPIO_TogglePin(BUZZER_PORT, BUZZER_PIN);
+					C1_UP_OFF;
+					C1_DOWN_OFF;
+					C2_UP_OFF;
+					C2_DOWN_OFF;
+					C3_UP_OFF;
+					C3_DOWN_OFF;
+					C4_UP_OFF;
+					C4_DOWN_OFF;
+
+					HAL_GPIO_WritePin(BUZZER_PORT, BUZZER_PIN, GPIO_PIN_SET);
 					vTaskDelay(100);
 					HAL_GPIO_TogglePin(BUZZER_PORT, BUZZER_PIN);
 					vTaskDelay(500);
 					HAL_GPIO_TogglePin(BUZZER_PORT, BUZZER_PIN);
 					vTaskDelay(100);
 					HAL_GPIO_WritePin(BUZZER_PORT, BUZZER_PIN, GPIO_PIN_RESET);
+					vTaskDelay(500);
+					HAL_GPIO_TogglePin(BUZZER_PORT, BUZZER_PIN);
+					vTaskDelay(100);
+					HAL_GPIO_WritePin(BUZZER_PORT, BUZZER_PIN, GPIO_PIN_RESET);
+					vTaskDelay(500);
+					HAL_GPIO_TogglePin(BUZZER_PORT, BUZZER_PIN);
+					vTaskDelay(100);
+					HAL_GPIO_WritePin(BUZZER_PORT, BUZZER_PIN, GPIO_PIN_RESET);
+					vTaskDelay(500);
+					HAL_GPIO_TogglePin(BUZZER_PORT, BUZZER_PIN);
+					vTaskDelay(100);
+					HAL_GPIO_WritePin(BUZZER_PORT, BUZZER_PIN, GPIO_PIN_RESET);
 
-					controllerState.errorStatus = STATUS_ERROR_OVERCURRENT;
+					controllerState.errorStatus |= (1 << STATUS_ERROR_OVERCURRENT);
 					controllerState.pressureCompensation = COMPENSATION_OFF;
 
 					C1_UP_OFF;

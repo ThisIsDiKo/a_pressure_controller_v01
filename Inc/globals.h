@@ -82,8 +82,15 @@
 
 #define ADC_DATA_PERIOD			50
 
-#define SETTINGS_FLASH_PAGE_ADDR	0x0801FC00 //TODO: check address
+#define SETTINGS_FLASH_PAGE_ADDR	0x0801F800 //TODO: check address
 
 #define MAX_ANALYZE_TRIES			7
+
+#define VIEW_SINGLE   1 //NO USE
+#define VIEW_0_2   2
+#define VIEW_1_1   3
+#define VIEW_1_2   4
+#define VIEW_2_1   5
+#define VIEW_2_2   6
 
 #endif /* GLOBALS_H_ */

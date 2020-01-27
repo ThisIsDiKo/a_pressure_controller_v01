@@ -36,7 +36,7 @@ void init_rf433(uint8_t channel){
 
 	huart1.Init.BaudRate = 19200;
 	if (HAL_UART_Init(&huart1) != HAL_OK){
-		Error_Handler();
+		//Error_Handler();
 	}
 }
 
