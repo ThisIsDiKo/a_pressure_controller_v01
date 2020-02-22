@@ -90,16 +90,16 @@ void xAnalyzeTask(void *arguments){
 						numOfWays[1] = 1;
 						break;
 					}
-					case VIEW_1_2:{ //THREE WAYS TWO FRONT AXLES
-						numOfAxles = 2;
-						numOfWays[0] = 2;
-						numOfWays[1] = 1;
-						break;
-					}
-					case VIEW_2_1:{ //THREE WAYS SINGLE FRONT AXLES
+					case VIEW_1_2:{ //THREE WAYS
 						numOfAxles = 2;
 						numOfWays[0] = 1;
 						numOfWays[1] = 2;
+						break;
+					}
+					case VIEW_2_1:{ //THREE WAYS
+						numOfAxles = 2;
+						numOfWays[0] = 2;
+						numOfWays[1] = 1;
 						break;
 					}
 					case VIEW_2_2:{ //FOUR WAYS
@@ -206,10 +206,10 @@ void xAnalyzeTask(void *arguments){
 						//i = axleCounter + axleCounter*numOfWays[0] + wayCounter;
 						i = axleCounter*numOfWays[0] + wayCounter;
 
-						#if DEBUG_SERIAL
-							messageLength = sprintf(message, "[INFO] %d: time %ld\n", i,  impTime[i]);
-							HAL_UART_Transmit(&huart1, (uint8_t*)message, messageLength, 0xFFFF);
-						#endif
+//						#if DEBUG_SERIAL
+//							messageLength = sprintf(message, "[INFO] %d: time %ld\n", i,  impTime[i]);
+//							HAL_UART_Transmit(&huart1, (uint8_t*)message, messageLength, 0xFFFF);
+//						#endif
 
 						if (impTime[i] > 0){
 							if (pressIsLower[i] == 1){
@@ -248,7 +248,7 @@ void xAnalyzeTask(void *arguments){
 							break;
 						}
 					}
-					vTaskDelay(1000);
+					vTaskDelay(3000);
 				} //stepCounter
 
 				if (controllerState.pressureCompensation == COMPENSATION_OFF){

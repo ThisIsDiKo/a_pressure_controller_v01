@@ -43,7 +43,37 @@ void xProcessCommandTask(void* arguments){
 			controllerState.lastTimeCommand = 0;
 
 			switch(command[0]){
+			case 'o':{
 
+				sscanf((char*)command, "o,%hu,\n", &id);
+				if (id == controllerState.serverUID){
+
+					controllerState.status = 0;
+					if (controllerState.pressureCompensation == COMPENSATION_ON){
+						controllerState.status = 0x01;
+					}
+
+					//valve overcurrent error
+					if (controllerState.errorStatus & (1 << STATUS_ERROR_OVERCURRENT)){
+						controllerState.status |= 0x02;
+					}
+
+					//pressure valve error
+					if (controllerState.errorStatus & (1 << STATUS_ERROR_VALVE)){
+						controllerState.status |= 0x03;
+					}
+
+					//added statusByte for best indication
+					messageLength = sprintf(message, "o,%hu,%hu,%hu,%hu,%hu,%c,\n", 	controllerData.clientID,
+							controllerState.filteredData[SENS_1],
+							controllerState.filteredData[SENS_2],
+							controllerState.filteredData[SENS_3],
+							controllerState.filteredData[SENS_4],
+																					controllerState.status);
+					HAL_UART_Transmit_DMA(&huart1, (uint8_t*) message, messageLength);
+				}
+				break;
+			}
 				case 'm':{
 
 					sscanf((char*)command, "m,%hu,%c,%c,\n", &id, &co, &outputState);
