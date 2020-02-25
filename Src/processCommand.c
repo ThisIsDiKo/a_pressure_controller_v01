@@ -87,12 +87,20 @@ void xProcessCommandTask(void* arguments){
 
 						//valve overcurrent error
 						if (controllerState.errorStatus & (1 << STATUS_ERROR_OVERCURRENT)){
-							controllerState.status |= 0x02;
+							//controllerState.status |= 0x02;
+							messageLength = sprintf(message, "w,%hu,\n",controllerData.clientID);
+							HAL_UART_Transmit_DMA(&huart1, (uint8_t*) message, messageLength);
+							controllerState.errorStatus = 0;
+							break;
 						}
 
 						//pressure valve error
 						if (controllerState.errorStatus & (1 << STATUS_ERROR_VALVE)){
-							controllerState.status |= 0x03;
+							//controllerState.status |= 0x03;
+							messageLength = sprintf(message, "q,%hu,0,\n",controllerData.clientID);
+							HAL_UART_Transmit_DMA(&huart1, (uint8_t*) message, messageLength);
+							controllerState.errorStatus = 0;
+							break;
 						}
 
 						//added statusByte for best indication

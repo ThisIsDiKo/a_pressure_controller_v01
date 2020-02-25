@@ -82,28 +82,30 @@ void xScanInputTask(void* arguments){
 					C4_UP_OFF;
 					C4_DOWN_OFF;
 
+					controllerState.errorStatus |= (1 << STATUS_ERROR_OVERCURRENT);
+					controllerState.pressureCompensation = COMPENSATION_OFF;
+
 					HAL_GPIO_WritePin(BUZZER_PORT, BUZZER_PIN, GPIO_PIN_SET);
 					vTaskDelay(100);
 					HAL_GPIO_TogglePin(BUZZER_PORT, BUZZER_PIN);
-					vTaskDelay(500);
+					vTaskDelay(200);
 					HAL_GPIO_TogglePin(BUZZER_PORT, BUZZER_PIN);
 					vTaskDelay(100);
 					HAL_GPIO_WritePin(BUZZER_PORT, BUZZER_PIN, GPIO_PIN_RESET);
-					vTaskDelay(500);
+					vTaskDelay(200);
 					HAL_GPIO_TogglePin(BUZZER_PORT, BUZZER_PIN);
 					vTaskDelay(100);
 					HAL_GPIO_WritePin(BUZZER_PORT, BUZZER_PIN, GPIO_PIN_RESET);
-					vTaskDelay(500);
+					vTaskDelay(200);
 					HAL_GPIO_TogglePin(BUZZER_PORT, BUZZER_PIN);
 					vTaskDelay(100);
 					HAL_GPIO_WritePin(BUZZER_PORT, BUZZER_PIN, GPIO_PIN_RESET);
-					vTaskDelay(500);
+					vTaskDelay(200);
 					HAL_GPIO_TogglePin(BUZZER_PORT, BUZZER_PIN);
 					vTaskDelay(100);
 					HAL_GPIO_WritePin(BUZZER_PORT, BUZZER_PIN, GPIO_PIN_RESET);
 
-					controllerState.errorStatus |= (1 << STATUS_ERROR_OVERCURRENT);
-					controllerState.pressureCompensation = COMPENSATION_OFF;
+
 
 					C1_UP_OFF;
 					C1_DOWN_OFF;
