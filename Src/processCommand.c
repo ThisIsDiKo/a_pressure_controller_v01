@@ -64,18 +64,17 @@ void xProcessCommandTask(void* arguments){
 					}
 
 					//added statusByte for best indication
-					messageLength = sprintf(message, "o,%hu,%hu,%hu,%hu,%hu,%c,\n", 	controllerData.clientID,
-							controllerState.filteredData[SENS_1],
-							controllerState.filteredData[SENS_2],
-							controllerState.filteredData[SENS_3],
-							controllerState.filteredData[SENS_4],
+					messageLength = sprintf(message, "o,%hu,%hu,%hu,%hu,%hu,%c,\n", controllerData.clientID,
+																					controllerState.filteredData[SENS_1],
+																					controllerState.filteredData[SENS_2],
+																					controllerState.filteredData[SENS_3],
+																					controllerState.filteredData[SENS_4],
 																					controllerState.status);
 					HAL_UART_Transmit_DMA(&huart1, (uint8_t*) message, messageLength);
 				}
 				break;
 			}
 				case 'm':{
-
 					sscanf((char*)command, "m,%hu,%c,%c,\n", &id, &co, &outputState);
 					outputState = command[10];
 					if (id == controllerState.serverUID){
@@ -105,13 +104,13 @@ void xProcessCommandTask(void* arguments){
 
 						//added statusByte for best indication
 						messageLength = sprintf(message, "m,%hu,%hu,%hu,%hu,%hu,%c,%c,%c,\n", 	controllerData.clientID,
-								controllerState.filteredData[SENS_1],
-								controllerState.filteredData[SENS_2],
-								controllerState.filteredData[SENS_3],
-								controllerState.filteredData[SENS_4],
-																						controllerState.status,
-																						controllerState.errorByte,
-																						controllerState.errorMeaningByte);
+																								controllerState.filteredData[SENS_1],
+																								controllerState.filteredData[SENS_2],
+																								controllerState.filteredData[SENS_3],
+																								controllerState.filteredData[SENS_4],
+																								controllerState.status,
+																								controllerState.errorByte,
+																								controllerState.errorMeaningByte);
 						HAL_UART_Transmit_DMA(&huart1, (uint8_t*) message, messageLength);
 
 						//if (outputState != prevOutputState && controllerState.errorStatus == STATUS_NORMAL){
@@ -184,7 +183,7 @@ void xProcessCommandTask(void* arguments){
 								controllerState.analyzeAccuracy = 90;
 							}
 							else{
-								controllerState.analyzeAccuracy = 40;
+								controllerState.analyzeAccuracy = 25;
 							}
 
 							if (controllerState.waysType > 6 || controllerState.waysType < 2){
@@ -210,6 +209,9 @@ void xProcessCommandTask(void* arguments){
 									#if DEBUG_SERIAL
 										messageLength = sprintf(message, "[ERROR] wrong sens\n");
 										HAL_UART_Transmit(&huart1, (uint8_t*)message, messageLength, 0xFFFF);
+									#else
+										messageLength = sprintf(message, "t,%hu,\n", 	controllerData.clientID);
+										HAL_UART_Transmit_DMA(&huart1, (uint8_t*) message, messageLength);
 									#endif
 									continue;
 								}
@@ -226,6 +228,9 @@ void xProcessCommandTask(void* arguments){
 									#if DEBUG_SERIAL
 										messageLength = sprintf(message, "[ERROR] wrong sens\n");
 										HAL_UART_Transmit(&huart1, (uint8_t*)message, messageLength, 0xFFFF);
+									#else
+										messageLength = sprintf(message, "t,%hu,\n", 	controllerData.clientID);
+										HAL_UART_Transmit_DMA(&huart1, (uint8_t*) message, messageLength);
 									#endif
 									continue;
 								}
@@ -239,10 +244,13 @@ void xProcessCommandTask(void* arguments){
 									successCounter += 1;
 								}
 								if (successCounter != 2){
-									#if DEBUG_SERIAL
-										messageLength = sprintf(message, "[ERROR] wrong sens\n");
-										HAL_UART_Transmit(&huart1, (uint8_t*)message, messageLength, 0xFFFF);
-									#endif
+										#if DEBUG_SERIAL
+											messageLength = sprintf(message, "[ERROR] wrong sens\n");
+											HAL_UART_Transmit(&huart1, (uint8_t*)message, messageLength, 0xFFFF);
+										#else
+											messageLength = sprintf(message, "t,%hu,\n", 	controllerData.clientID);
+											HAL_UART_Transmit_DMA(&huart1, (uint8_t*) message, messageLength);
+										#endif
 									continue;
 								}
 							}

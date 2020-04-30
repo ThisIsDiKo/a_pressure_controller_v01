@@ -80,7 +80,7 @@
 
 #define PRESSURE_ACCURACY			75
 
-#define ADC_DATA_PERIOD			50
+#define ADC_DATA_PERIOD				50
 
 #define SETTINGS_FLASH_PAGE_ADDR	0x0801F800 //TODO: check address
 

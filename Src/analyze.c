@@ -10,6 +10,8 @@
 #include "analyze.h"
 #include "flashFunctions.h"
 
+#include <stdlib.h>
+
 extern xSemaphoreHandle xPressureCompensationSemaphore;
 extern UART_HandleTypeDef huart1;
 
@@ -72,7 +74,7 @@ void xAnalyzeTask(void *arguments){
 
 				//axles calculations
 				switch (controllerState.waysType){
-					case 1:{ // Single Way
+					case 1:{ // Single Way not used
 						numOfAxles = 1;
 						numOfWays[0] = 1;
 						numOfWays[1] = 0;
@@ -166,7 +168,7 @@ void xAnalyzeTask(void *arguments){
 								HAL_UART_Transmit(&huart1, (uint8_t*)message, messageLength, 0xFFFF);
 							#endif
 
-							if (impTime[i] < 0) impTime[i] = 0;
+							if (impTime[i] < 0) impTime[i] = 1000; //was 0
 							else if (impTime[i] == 0) impTime[i] = 1000;
 							else if (impTime[i] > 10000) impTime[i] = 10000;
 							else if (impTime[i] > 30000) impTime[i] = 1000;
@@ -179,7 +181,7 @@ void xAnalyzeTask(void *arguments){
 								HAL_UART_Transmit(&huart1, (uint8_t*)message, messageLength, 0xFFFF);
 							#endif
 
-							if (impTime[i] < 0) impTime[i] = 0;
+							if (impTime[i] < 0) impTime[i] = 500; //was 0
 							else if (impTime[i] == 0) impTime[i] = 500;
 							else if (impTime[i] > 10000) impTime[i] = 10000;
 							else if (impTime[i] > 30000) impTime[i] = 500;
@@ -203,14 +205,7 @@ void xAnalyzeTask(void *arguments){
 					}
 
 					for (wayCounter = 0; wayCounter < numOfWays[axleCounter]; wayCounter++){
-						//i = axleCounter + axleCounter*numOfWays[0] + wayCounter;
 						i = axleCounter*numOfWays[0] + wayCounter;
-
-//						#if DEBUG_SERIAL
-//							messageLength = sprintf(message, "[INFO] %d: time %ld\n", i,  impTime[i]);
-//							HAL_UART_Transmit(&huart1, (uint8_t*)message, messageLength, 0xFFFF);
-//						#endif
-
 						if (impTime[i] > 0){
 							if (pressIsLower[i] == 1){
 								HAL_GPIO_WritePin(UP_PORT[i], UP_PIN[i], GPIO_PIN_SET);
@@ -263,8 +258,9 @@ void xAnalyzeTask(void *arguments){
 					controllerState.numberOfTries = 0;
 					continue;
 				}
-//here starts common code
-
+				/*
+				 * HERE STARTS COMMON CODE
+				 */
 				controllerState.errorMeaningByte = 0;
 				for (i = 0 ; i < 4; i++){
 					if (impTime[i] > 500){
@@ -429,11 +425,5 @@ void xAnalyzeTask(void *arguments){
 		}
 	}
 }
-/*
- * analyze.c
- *
- *  Created on: 4 окт. 2019 г.
- *      Author: ADiKo
- */
 
 

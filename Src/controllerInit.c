@@ -30,12 +30,15 @@ extern uint8_t recCommandByte;
 
 void xBlynkTask(void* arguments){
 	for(;;){
+		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
 		switch(controllerState.soundIndicationState){
 		case SEARCH_INDICATION:
 			HAL_GPIO_TogglePin(BUZZER_PORT, BUZZER_PIN);
 			break;
 		case NORMAL_INDICATION:
 			HAL_GPIO_WritePin(BUZZER_PORT, BUZZER_PIN, GPIO_PIN_RESET);
+
+			//TODO: toggle Led Blynk
 			break;
 		default:
 			break;
