@@ -1,7 +1,7 @@
 cmsis_os.c:193:10:osKernelStart	8	static
 cmsis_os.c:208:9:osKernelRunning	8	static
 cmsis_os.c:227:10:osKernelSysTick	0	static
-cmsis_os.c:245:12:osThreadCreate	40	static
+cmsis_os.c:245:12:osThreadCreate	32	static
 cmsis_os.c:283:12:osThreadGetId	0	static
 cmsis_os.c:298:10:osThreadTerminate	8	static
 cmsis_os.c:313:10:osThreadYield	0	static
@@ -16,7 +16,7 @@ cmsis_os.c:545:9:osSignalSet	24	static
 cmsis_os.c:586:9:osSignalWait	32	static
 cmsis_os.c:640:11:osMutexCreate	0	static
 cmsis_os.c:669:10:osMutexWait	16	static
-cmsis_os.c:755:15:osSemaphoreCreate	24	static
+cmsis_os.c:755:15:osSemaphoreCreate	8	static
 cmsis_os.c:822:9:osSemaphoreWait	16	static
 cmsis_os.c:862:10:osSemaphoreRelease	16	static
 cmsis_os.c:709:10:osMutexRelease	0	static
@@ -24,7 +24,7 @@ cmsis_os.c:926:10:osPoolCreate	24	static
 cmsis_os.c:979:7:osPoolAlloc	16	static
 cmsis_os.c:1023:7:osPoolCAlloc	8	static
 cmsis_os.c:1042:10:osPoolFree	0	static
-cmsis_os.c:1086:14:osMessageCreate	16	static
+cmsis_os.c:1086:14:osMessageCreate	0	static
 cmsis_os.c:1113:10:osMessagePut	24	static
 cmsis_os.c:1145:9:osMessageGet	40	static
 cmsis_os.c:1214:11:osMailCreate	32	static

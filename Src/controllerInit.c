@@ -37,8 +37,6 @@ void xBlynkTask(void* arguments){
 			break;
 		case NORMAL_INDICATION:
 			HAL_GPIO_WritePin(BUZZER_PORT, BUZZER_PIN, GPIO_PIN_RESET);
-
-			//TODO: toggle Led Blynk
 			break;
 		default:
 			break;
