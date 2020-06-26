@@ -30,7 +30,7 @@ extern uint8_t recCommandByte;
 
 void xBlynkTask(void* arguments){
 	for(;;){
-		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
+		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_12);
 		switch(controllerState.soundIndicationState){
 		case SEARCH_INDICATION:
 			HAL_GPIO_TogglePin(BUZZER_PORT, BUZZER_PIN);

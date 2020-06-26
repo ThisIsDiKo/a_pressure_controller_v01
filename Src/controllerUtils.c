@@ -19,16 +19,60 @@ void print_debug(char* msg){
 	#endif
 }
 
+//void init_rf433(uint8_t channel){
+//	CMD_RF_ON;
+//	HAL_Delay(50);
+//
+//	HAL_UART_Transmit(&huart1, (uint8_t*) "AT+FU1\r", 7, 0x2000);
+//	HAL_Delay(200);
+//	HAL_UART_Transmit(&huart1, (uint8_t*) "AT+B19200\r", 7, 0x2000);
+//	HAL_Delay(200);
+//	debugMessageLength = sprintf(debugMessage, "AT+C%03d\r", channel);
+//	HAL_UART_Transmit(&huart1, (uint8_t*) debugMessage, debugMessageLength, 0x2000);
+//	HAL_Delay(200);
+//
+//	CMD_RF_OFF;
+//	HAL_Delay(50);
+//
+//	huart1.Init.BaudRate = 19200;
+//	if (HAL_UART_Init(&huart1) != HAL_OK){
+//		//Error_Handler();
+//	}
+//}
+
 void init_rf433(uint8_t channel){
+	char bufLenRf = 0;
+	char bufRf[10] = {0};
+	uint8_t recVal = 0;
+
 	CMD_RF_ON;
 	HAL_Delay(50);
 
 	HAL_UART_Transmit(&huart1, (uint8_t*) "AT+FU1\r", 7, 0x2000);
+	HAL_UART_Receive(&huart1, &recVal, 1, 100);
 	HAL_Delay(200);
-	HAL_UART_Transmit(&huart1, (uint8_t*) "AT+B19200\r", 7, 0x2000);
+
+	if (recVal != 'O'){
+		huart1.Init.BaudRate = 19200;
+		if (HAL_UART_Init(&huart1) != HAL_OK){
+
+		}
+		HAL_UART_Transmit(&huart1, (uint8_t*) "AT+FU1\r", 7, 0x2000);
+		HAL_Delay(200);
+
+	}
+
+	HAL_UART_Transmit(&huart1, (uint8_t*) "AT+P8\r", 6, 0x2000);
 	HAL_Delay(200);
-	debugMessageLength = sprintf(debugMessage, "AT+C%03d\r", channel);
-	HAL_UART_Transmit(&huart1, (uint8_t*) debugMessage, debugMessageLength, 0x2000);
+
+//	HAL_UART_Transmit(&huart1, (uint8_t*) "AT+DEFAULT\r", 11, 0x2000);
+//	HAL_Delay(200);
+
+	HAL_UART_Transmit(&huart1, (uint8_t*) "AT+B19200\r", 10, 0x2000);
+	HAL_Delay(200);
+	if (channel == 0 || channel > 127) channel = 1;
+	bufLenRf = sprintf(bufRf, "AT+C%03d\r", channel);
+	HAL_UART_Transmit(&huart1, (uint8_t*) bufRf, bufLenRf, 0x2000);
 	HAL_Delay(200);
 
 	CMD_RF_OFF;
@@ -36,7 +80,7 @@ void init_rf433(uint8_t channel){
 
 	huart1.Init.BaudRate = 19200;
 	if (HAL_UART_Init(&huart1) != HAL_OK){
-		//Error_Handler();
+
 	}
 }
 
