@@ -24,7 +24,17 @@ typedef struct{
 	float impUpCoeff[4];
 	float impDownCoeff[4];
 	uint16_t offsetPressure[4];
+	uint32_t writeCounter;
 } ControllerSettings;
+
+typedef struct{
+	uint8_t version;
+	uint8_t settingsAddress;
+	uint16_t connectionNum;
+	uint32_t turnOnNum;
+	uint32_t aligningNum;
+	uint32_t errorAligningNum;
+}ControllerInfo;
 
 
 typedef enum{
@@ -79,6 +89,7 @@ typedef struct{
 
 
 extern PressureControllerState controllerState;
-extern ControllerSettings controllerData;
+extern volatile ControllerSettings controllerData;
+extern ControllerInfo controllerInfo;
 
 #endif /* STRUCTURES_H_ */

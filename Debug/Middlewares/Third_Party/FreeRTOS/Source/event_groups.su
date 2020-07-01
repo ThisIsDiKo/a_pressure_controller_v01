@@ -1,4 +1,5 @@
-event_groups.c:174:21:xEventGroupCreate	8	static
+event_groups.c:135:21:xEventGroupCreateStatic	8	static
+event_groups.c:174:21:xEventGroupCreate	16	static
 event_groups.c:324:13:xEventGroupWaitBits	32	static
 event_groups.c:472:13:xEventGroupClearBits	16	static
 event_groups.c:514:13:xEventGroupGetBitsFromISR	0	static

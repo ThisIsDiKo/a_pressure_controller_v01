@@ -126,6 +126,11 @@ void xStoreADCDataTask(void* arguments){
 		sensorValue[SENS_3] = ADCRawData[SENS_3];
 		sensorValue[SENS_4] = ADCRawData[SENS_4];
 
+//#if DEBUG_SERIAL
+//	sprintf(message, "val: %d %d %d %d\n", sensorValue[SENS_1], sensorValue[SENS_2], sensorValue[SENS_3], sensorValue[SENS_4]);
+//	HAL_UART_Transmit(&huart1, (uint8_t*)message, strlen(message), 0xFFFF);
+//#endif
+
 		HAL_ADCEx_InjectedStart_IT(&hadc1);
 		//HAL_ADCEx_InjectedStart_IT(&hadc2);
 
@@ -159,6 +164,7 @@ void xStoreADCDataTask(void* arguments){
 		}
 
 		vTaskDelay(ADC_DATA_PERIOD / portTICK_RATE_MS);
+		//vTaskDelay(500);
 	}
 
 	vTaskDelete(NULL);

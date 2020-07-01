@@ -12,7 +12,10 @@
 #include "cmsis_os.h"
 #include <string.h>
 
-#define DEBUG_SERIAL	0
+#define FIRMWARE_VERSION						2
+
+#define DEBUG_SERIAL							0
+#define DEBUG_EEPROM							0
 
 #define HALL_SENS_PORT							GPIOA
 #define HALL_SENS_PIN							GPIO_PIN_12
@@ -67,6 +70,18 @@
 #define CMD_RF_OFF								HAL_GPIO_WritePin(CMD_RF_PORT, CMD_RF_PIN, GPIO_PIN_SET)
 #define CMD_RF_ON								HAL_GPIO_WritePin(CMD_RF_PORT, CMD_RF_PIN, GPIO_PIN_RESET)
 
+#define EEPROM_CS_ON							HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_RESET)
+#define EEPROM_CS_OFF							HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_SET)
+
+#define EEPROM_WP_ON							HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_RESET)
+#define EEPROM_WP_OFF							HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_SET)
+
+#define EEPROM_HOLD_ON							HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4, GPIO_PIN_RESET)
+#define EEPROM_HOLD_OFF							HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4, GPIO_PIN_SET)
+
+
+
+
 #define MAX_COMMAND_LENGTH						64
 #define COMMAND_QUEUE_SIZE						2
 
@@ -85,6 +100,14 @@
 #define SETTINGS_FLASH_PAGE_ADDR	0x0801F800 //TODO: check address
 
 #define MAX_ANALYZE_TRIES			7
+
+
+#define EEPROM_VERSION_ADDR					0
+#define EEPROM_SETTINGS_ADDR				1
+#define EEPROM_CONNECTION_NUM_ADDR			2
+#define EEPROM_TURN_ON_NUM_ADDR				4
+#define EEPROM_ALIGNING_NUM_ADDR			8
+#define EEPROM_ERROR_ALIGNING_NUM_ADDR		12
 
 #define VIEW_SINGLE   1 //NO USE
 #define VIEW_0_2   2

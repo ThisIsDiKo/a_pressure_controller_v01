@@ -1,2 +1,2 @@
-controllerInit.c:31:6:xBlynkTask	8	static
-controllerInit.c:50:6:controller_init	40	static
+controllerInit.c:35:6:xBlynkTask	8	static
+controllerInit.c:54:6:controller_init	40	static

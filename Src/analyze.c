@@ -10,6 +10,8 @@
 #include "analyze.h"
 #include "flashFunctions.h"
 #include <stdlib.h>
+#include "eepromTasks.h"
+#include "eeprom_driver.h"
 
 extern xSemaphoreHandle xPressureCompensationSemaphore;
 extern UART_HandleTypeDef huart1;
@@ -53,6 +55,13 @@ void xAnalyzeTask(void *arguments){
 			if (controllerState.numberOfTries >= MAX_ANALYZE_TRIES){
 				controllerState.numberOfTries = 0;
 				controllerState.pressureCompensation = COMPENSATION_OFF;
+
+				controllerInfo.aligningNum += 1;
+				eeprom_write_page(EEPROM_ALIGNING_NUM_ADDR, (uint8_t*) &controllerInfo.aligningNum, sizeof(controllerInfo.aligningNum));
+				vTaskDelay(5);
+				controllerInfo.errorAligningNum += 1;
+				eeprom_write_page(EEPROM_ERROR_ALIGNING_NUM_ADDR, (uint8_t*) &controllerInfo.errorAligningNum, sizeof(controllerInfo.errorAligningNum));
+				vTaskDelay(5);
 
 				#if DEBUG_SERIAL
 					messageLength = sprintf(message, "[INFO] exit by tries\n");
@@ -136,7 +145,20 @@ void xAnalyzeTask(void *arguments){
 				impTime[3] = 0;
 				controllerState.numberOfTries = 0;
 
-				mWrite_flash();
+				controllerInfo.aligningNum += 1;
+				eeprom_write_page(EEPROM_ALIGNING_NUM_ADDR, (uint8_t*) &controllerInfo.aligningNum, sizeof(controllerInfo.aligningNum));
+				vTaskDelay(5);
+
+				controllerData.writeCounter += 1;
+				xTaskCreate(xEepromWriteSettings,
+							"Eeprom",
+							200,
+							NULL,
+							1,
+							NULL);
+
+
+				//mWrite_flash();
 				continue;
 			}
 

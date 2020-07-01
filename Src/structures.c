@@ -7,6 +7,7 @@
 #include "structures.h"
 
 PressureControllerState controllerState = {0};
-ControllerSettings controllerData = {0};
+volatile ControllerSettings controllerData = {0};
+ControllerInfo controllerInfo = {0};
 
 

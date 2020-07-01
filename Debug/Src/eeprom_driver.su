@@ -1,0 +1,11 @@
+eeprom_driver.c:13:9:eeprom_write_byte	24	static
+eeprom_driver.c:28:9:eeprom_read_byte	24	static
+eeprom_driver.c:43:6:eeprom_wren	24	static
+eeprom_driver.c:50:9:eeprom_read_status	24	static
+eeprom_driver.c:63:9:eeprom_write_page_isr	40	static
+eeprom_driver.c:85:9:eeprom_write_page	40	static
+eeprom_driver.c:114:9:eeprom_read_page	32	static
+eeprom_driver.c:128:6:eeprom_read_controller_info	0	static
+eeprom_driver.c:133:6:eeprom_write_controller_settings	16	static
+eeprom_driver.c:141:6:eeprom_read_controller_settings	0	static
+eeprom_driver.c:145:6:eeprom_clear_pages	40	static

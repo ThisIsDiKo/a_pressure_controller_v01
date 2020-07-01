@@ -11,6 +11,9 @@
 #include "flashFunctions.h"
 #include "controllerUtils.h"
 
+#include "eepromTasks.h"
+#include "eeprom_driver.h"
+
 extern UART_HandleTypeDef huart1;
 
 
@@ -70,6 +73,20 @@ void xProcessCommandTask(void* arguments){
 							controllerState.filteredData[SENS_3],
 							controllerState.filteredData[SENS_4],
 																					controllerState.status);
+					HAL_UART_Transmit_DMA(&huart1, (uint8_t*) message, messageLength);
+				}
+				break;
+			}
+			case 'p':{
+				sscanf((char*)command, "p,%hu,\n", &id);
+				if (id == controllerState.serverUID){
+					//added statusByte for best indication
+					messageLength = sprintf(message, "p,%hu,%hu,%hu,%lu,%lu,%lu,\n",controllerData.clientID,
+							controllerInfo.version,
+							controllerInfo.connectionNum,
+							controllerInfo.turnOnNum,
+							controllerInfo.aligningNum,
+							controllerInfo.errorAligningNum);
 					HAL_UART_Transmit_DMA(&huart1, (uint8_t*) message, messageLength);
 				}
 				break;
@@ -264,7 +281,19 @@ void xProcessCommandTask(void* arguments){
 
 							if (id == controllerState.serverUID){
 								controllerData.rfChannel = channel;
-								mWrite_flash();
+								controllerData.writeCounter += 1;
+
+								controllerInfo.connectionNum += 1;
+								eeprom_write_page(EEPROM_CONNECTION_NUM_ADDR, (uint8_t*) &controllerInfo.connectionNum, sizeof(controllerInfo.connectionNum));
+								vTaskDelay(5);
+//								mWrite_flash();
+								xTaskCreate(xEepromWriteSettings,
+											"Eeprom",
+											200,
+											NULL,
+											1,
+											NULL);
+
 								messageLength = sprintf(message, "xc,%05d,ok,\n", controllerData.clientID);
 								HAL_UART_Transmit_DMA(&huart1, (uint8_t*) message, messageLength);
 
