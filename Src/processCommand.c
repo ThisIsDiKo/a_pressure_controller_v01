@@ -22,6 +22,32 @@ extern xQueueHandle xRecCommandQueue;
 extern char message[128];
 extern uint8_t messageLength;
 
+
+uint8_t crc_sum(char* s, uint8_t len){
+	uint8_t i = 0;
+	uint8_t sum = 0;
+
+	for(i = 0; i < len; i++){
+		if (i == 1) continue;
+		sum = sum ^ s[i];
+	}
+
+	if (sum == 10) sum = 9;
+	return sum;
+}
+
+uint8_t s_len_crc(char* s, char endChar){
+	uint8_t i = 0;
+	uint8_t len = 0;
+
+	for(i = 0; i < 128; i++){
+		len += 1;
+		if (s[i] == endChar) break;
+	}
+
+	return len;
+}
+
 void xProcessCommandTask(void* arguments){
 	portBASE_TYPE xStatus;
 	uint8_t command[MAX_COMMAND_LENGTH] = {0};
@@ -38,6 +64,10 @@ void xProcessCommandTask(void* arguments){
 	char waysType;
 	char accuracy;
 	uint8_t successCounter = 0;
+
+	uint8_t sum = 0;
+	uint8_t calcSum = 0;
+	uint8_t len = 0;
 
 	for(;;){
 		xStatus = xQueueReceive(xRecCommandQueue, command, portMAX_DELAY);
@@ -93,8 +123,14 @@ void xProcessCommandTask(void* arguments){
 			}
 				case 'm':{
 
-					sscanf((char*)command, "m,%hu,%c,%c,\n", &id, &co, &outputState);
-					outputState = command[10];
+					//sscanf((char*)command, "m,%hu,%c,%c,\n", &id, &co, &outputState);
+					sscanf((char*)command, "m%c,%hu,%c,%c,\n", &sum, &id, &co, &outputState);
+					len = s_len_crc((char*)command, '\n');
+					calcSum = crc_sum((char*)command, len);
+
+					if(calcSum != sum) break;
+
+					outputState = command[11];
 					if (id == controllerState.serverUID){
 
 						controllerState.status = 0;
