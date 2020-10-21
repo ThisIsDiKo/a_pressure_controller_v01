@@ -211,7 +211,7 @@ void controller_init(){
 
 	xTaskCreate(xProcessCommandTask,
 				"ProcCmd",
-				512,
+				700,
 				NULL,
 				3,
 				NULL);

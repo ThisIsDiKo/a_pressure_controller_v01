@@ -40,9 +40,14 @@ uint8_t s_len_crc(char* s, char endChar){
 	uint8_t i = 0;
 	uint8_t len = 0;
 
+//	for(i = 0; i < 128; i++){
+//		len += 1;
+//		if (s[i] == endChar) break;
+//	}
+
 	for(i = 0; i < 128; i++){
 		len += 1;
-		if (s[i] == endChar) break;
+		if (s[i] == endChar && len > 12) break;
 	}
 
 	return len;
@@ -128,7 +133,11 @@ void xProcessCommandTask(void* arguments){
 					len = s_len_crc((char*)command, '\n');
 					calcSum = crc_sum((char*)command, len);
 
-					if(calcSum != sum) break;
+					if(calcSum != sum){
+//						messageLength = sprintf(message, "error_sum\n");
+//						HAL_UART_Transmit_DMA(&huart1, (uint8_t*) message, messageLength);
+						break;
+					}
 
 					outputState = command[11];
 					if (id == controllerState.serverUID){

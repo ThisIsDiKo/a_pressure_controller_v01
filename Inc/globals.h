@@ -82,7 +82,7 @@
 
 
 
-#define MAX_COMMAND_LENGTH						64
+#define MAX_COMMAND_LENGTH						128
 #define COMMAND_QUEUE_SIZE						2
 
 
